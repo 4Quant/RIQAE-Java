@@ -296,8 +296,10 @@
                     <skipTests>true</skipTests>
                     -->
 
-                    <parallel>suites</parallel>
+                    <parallel>none</parallel>
                     <threadCount>1</threadCount>
+                    <argLine>-Xms2g -Xmx12g</argLine>
+                    <parallelOptimized>false</parallelOptimized>
 
                 </configuration>
             </plugin>

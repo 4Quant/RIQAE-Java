@@ -30,7 +30,7 @@ public class SQLDemoTest implements Serializable {
 
         sq.sql("CREATE TEMPORARY TABLE DemoPacs\n" +
                 "USING fourquant.pacs\n" +
-                "OPTIONS (debug \"true\", debug_name \"Anonymous Sid 10007\")");
+                "OPTIONS (debug \"true\", debug_name \"Anonymous Sid 10201\")");
 
         // execute the command SHOW TABLES
         DataFrame allTables = sq.sql("SHOW TABLES");
@@ -48,10 +48,12 @@ public class SQLDemoTest implements Serializable {
 
         sq.sql("CREATE TEMPORARY TABLE DownloadPacs\n" +
                 "USING fourquant.pacs\n" +
-                "OPTIONS (debug \"true\", debug_name \"Anonymous Sid 10007\")");
+                "OPTIONS (debug \"true\", debug_name \"Anonymous Sid 10201\")");
 
 
         // execute the command SHOW TABLES
+        sq.table("DownloadPacs").printSchema();
+
         DataFrame tabDesc = sq.sql("DESCRIBE DownloadPacs");
         // show all of the results
         tabDesc.toJavaRDD().foreach(new VoidFunction<Row>() {
@@ -73,9 +75,7 @@ public class SQLDemoTest implements Serializable {
             }
         });
 
-
         String fImage = "fetch_dicom_imagej(studyInstanceUID,seriesInstanceUID)";
-
 
         String segCommand = "run2("+fImage+",'"+USBImageJSettings.SegmentLung()+"','')";
 
