@@ -84,7 +84,7 @@
             <version>2.1.5</version>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -271,7 +271,7 @@
                     <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
                     <junitxml>.</junitxml>
                     <filereports>${project.build.directory}/SparkTestSuite.txt</filereports>
-                    <argLine>-Xmx3g -XX:MaxPermSize=${MaxPermGen} -XX:ReservedCodeCacheSize=512m</argLine>
+                    <argLine>-Xmx4g -XX:MaxPermSize=${MaxPermGen} -XX:ReservedCodeCacheSize=512m</argLine>
                     <stderr/>
                     <environmentVariables>
                         <SPARK_TESTING>1</SPARK_TESTING>
