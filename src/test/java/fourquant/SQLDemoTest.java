@@ -18,6 +18,9 @@ import scala.runtime.BoxedUnit;
 
 import java.io.Serializable;
 
+/**
+ * A simple class showing a few basic demos of the functionality on generic anonymized datasets
+ */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SQLDemoTest implements Serializable {
     final static String fijiPath = "/Applications/Fiji.app/Contents/";
@@ -51,6 +54,7 @@ public class SQLDemoTest implements Serializable {
     }
 
     @Test
+    @Ignore
     public void testCOPDPlugin() {
 
         sq.sql("CREATE TEMPORARY TABLE DownloadPacs\n" +

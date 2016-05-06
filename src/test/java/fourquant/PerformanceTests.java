@@ -1,16 +1,13 @@
 package fourquant;
 
 import fourquant.imagej.ImageJSettings;
-import fourquant.imagej.PortableImagePlus;
 import fourquant.riqae.USBImageJSettings;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
-import org.glassfish.grizzly.streams.BufferedInput;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import scala.Option;
@@ -105,29 +102,44 @@ public class PerformanceTests implements Serializable {
         testFirstImageQuery();
     }
 
+    protected static void checkOutputFiles(String path, int expectedCount) {
+        File[] out_files = new File(path).listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                // no junk files
+                return !pathname.getName().startsWith(".");
+            }
+        });
+        for (File r : out_files) System.out.println(r.getAbsolutePath());
+        BufferedSource bi = scala.io.Source.fromFile(out_files[0],"utf-8");
+        System.out.println("files->"+bi.getLines().mkString("\n").substring(0,1000));
 
+        assertEquals("Output files should be "+expectedCount,out_files.length,expectedCount);
+    }
     /**
      * This test shows how the dicom files can be output into a folder
      * @throws IOException if the folder cannot be created
      */
     @Test
-    public void testOutputingImages() throws IOException {
+    public void testOutputingImagesJson() throws IOException {
         String jsonOutputName = File.createTempFile("sql_output",".json").getAbsolutePath()+"_folder/";
         DataFrame df = sq.sql("SELECT patientName,toarray(image) slice_count FROM ImageTable");
         //TODO the builtin json doesn't register here so the class name is now explicit
         df.write().format("org.apache.spark.sql.json").save(jsonOutputName);
-        File[] out_files = new File(jsonOutputName).listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                // no junk files
-                return pathname.getName().contains("part-");
-            }
-        });
-        for (File r : out_files) System.out.println(r.getAbsolutePath());
-        BufferedSource bi = scala.io.Source.fromFile(out_files[0],"utf-8");
-        System.out.println("json->"+bi.getLines().mkString("\n"));
+        checkOutputFiles(jsonOutputName,1);
+    }
 
-        assertEquals(out_files.length,1);
+    /**
+     * Performs the same task as
+     * @throws IOException
+     */
+    @Test
+    public void testOutputingImagesParquet() throws IOException {
+        String pqtOutput = File.createTempFile("sql_output",".pqt").getAbsolutePath()+"_folder/";
+        DataFrame df = sq.sql("SELECT patientName,toarray(image) slice_count FROM ImageTable");
+        //TODO the builtin json doesn't register here so the class name is now explicit
+        df.write().format("org.apache.spark.sql.parquet").save(pqtOutput);
+        checkOutputFiles(pqtOutput,1);
     }
 
     @Test
