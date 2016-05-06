@@ -1,31 +1,38 @@
 package fourquant;
 
 import fourquant.imagej.ImageJSettings;
+import fourquant.imagej.PortableImagePlus;
 import fourquant.riqae.USBImageJSettings;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
+import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import scala.Function1;
 import scala.Option;
 import scala.runtime.BoxedUnit;
 
 import java.io.Serializable;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SQLDemoTest implements Serializable {
-    final String fijiPath = "/Applications/Fiji.app/Contents/";
-    final ImageJSettings ijs = new USBImageJSettings(fijiPath,false,false,false);
-    final int bindPort = 11112;
-    final String bindAddress = "localhost";
+    final static String fijiPath = "/Applications/Fiji.app/Contents/";
+    final static ImageJSettings ijs = new USBImageJSettings(fijiPath,false,false,false);
+    final static int bindPort = 11112;
+    final static String bindAddress = "localhost";
     // we don't want a directory based table at all
-    final Option<String> basePathInput = Option.empty();
-
-    final SQLContext sq = fourquant.db.demo.createSQLTool(basePathInput,bindPort,bindAddress,"TestTable",false,true,
+    final static Option<String> basePathInput = Option.empty();
+    final static transient SQLContext sq = fourquant.db.demo.createSQLTool(basePathInput,bindPort,bindAddress,
+            "TestTable",
+            false,true,
             ijs);
 
-    //@Test
+    @Test
+    @Ignore
     public void testCreateTemporaryPacs() {
 
         sq.sql("CREATE TEMPORARY TABLE DemoPacs\n" +

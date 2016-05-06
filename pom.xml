@@ -56,25 +56,22 @@
         <!-- datanucleus dependencies -->
 
         <dependency>
-            <groupId>fourquant</groupId>
-            <artifactId>dn-jdo</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../assembly/libs/datanucleus-api-jdo-3.2.6.jar</systemPath>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>datanucleus-core</artifactId>
+            <version>3.2.10</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>fourquant</groupId>
-            <artifactId>dn-core</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../assembly/libs/datanucleus-core-3.2.10.jar</systemPath>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>datanucleus-api-jdo</artifactId>
+            <version>3.2.6</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>fourquant</groupId>
-            <artifactId>dn-rdbms</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../assembly/libs/datanucleus-rdbms-3.2.9.jar</systemPath>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>datanucleus-rdbms</artifactId>
+            <version>3.2.9</version>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- for testing -->
@@ -296,7 +293,7 @@
                     <skipTests>true</skipTests>
                     -->
 
-                    <parallel>none</parallel>
+                    <parallel>classes</parallel>
                     <threadCount>1</threadCount>
                     <argLine>-Xms2g -Xmx12g</argLine>
                     <parallelOptimized>false</parallelOptimized>
