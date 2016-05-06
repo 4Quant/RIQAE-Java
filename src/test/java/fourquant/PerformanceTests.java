@@ -17,6 +17,7 @@ import scala.Option;
 import scala.io.BufferedSource;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -54,9 +55,12 @@ public class PerformanceTests implements Serializable {
 
         DataFrame simpleImages = sq.sql(simpleQuery);
         simpleImages.
+                cache().
                 registerTempTable("ImageTable"); // create a table for other sql queries to use
 
         sq.cacheTable("ImageTable"); // cache the table for improved multiquery performance
+        sq.sql("CACHE TABLE ImageTable"); // cache using standard SQL procedures
+
         assertTrue(sq.isCached("ImageTable"));
     }
 
@@ -78,9 +82,13 @@ public class PerformanceTests implements Serializable {
         assertEquals(tabDesc.count(),1);
     }
 
+    /**
+     * A simple query of the image table and show the number of slices and calibration information
+     */
     @Test
     public void testFirstImageQuery() {
-        Row[] allRows = sq.sql("SELECT patientName,nslices(image) slice_count FROM ImageTable").collect();
+        Row[] allRows = sq.sql("SELECT patientName,nslices(image) slice_count,showcalibration(image) calib FROM ImageTable")
+                .collect();
         // show all of the results
         for (Row r : allRows) System.out.println(r.mkString(","));
 
@@ -107,7 +115,13 @@ public class PerformanceTests implements Serializable {
         DataFrame df = sq.sql("SELECT patientName,toarray(image) slice_count FROM ImageTable");
         //TODO the builtin json doesn't register here so the class name is now explicit
         df.write().format("org.apache.spark.sql.json").save(jsonOutputName);
-        File[] out_files = new File(jsonOutputName).listFiles();
+        File[] out_files = new File(jsonOutputName).listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                // no junk files
+                return pathname.getName().contains("/part-");
+            }
+        });
         for (File r : out_files) System.out.println(r.getAbsolutePath());
         BufferedSource bi = scala.io.Source.fromFile(out_files[0],"utf-8");
         System.out.println("json->"+bi.getLines().mkString("\n"));
