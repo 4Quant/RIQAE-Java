@@ -33,10 +33,12 @@ public class PerformanceTests implements Serializable {
     final static String bindAddress = "localhost";
     // we don't want a directory based table at all
     final static Option<String> basePathInput = Option.empty();
-    final static transient SQLContext sq = fourquant.db.demo.createSQLTool(basePathInput,bindPort,bindAddress,
-            "TestTable",
-            false,true,
-            ijs);
+
+    final static boolean use_hive = true;
+
+    final static transient SQLContext sq = fourquant.db.demo.createSQLContext(basePathInput,bindPort,bindAddress,"",
+            true,
+            ijs,use_hive);
 
     @Before
     public void setupDatabase() {
@@ -48,7 +50,7 @@ public class PerformanceTests implements Serializable {
 
     @Test
     public void testAppendingTable() {
-        String simpleQuery = "SELECT patientName,fetch_dicom_imagej(studyInstanceUID,seriesInstanceUID) Image " +
+        String simpleQuery = "SELECT patientName,fetch_dicom_imagej(studyInstanceUID,seriesInstanceUID) image " +
                 "FROM DownloadPacs WHERE success=true LIMIT 1";
 
         DataFrame simpleImages = sq.sql(simpleQuery);
@@ -59,7 +61,8 @@ public class PerformanceTests implements Serializable {
         sq.cacheTable("ImageTable"); // cache the table for improved multiquery performance
         sq.sql("CACHE TABLE ImageTable"); // cache using standard SQL procedures
 
-        //TODO fix test assertTrue(sq.isCached("ImageTable"));
+        //TODO fix test
+        assertTrue(sq.isCached("ImageTable"));
     }
 
     @Test
@@ -102,17 +105,21 @@ public class PerformanceTests implements Serializable {
         testFirstImageQuery();
     }
 
-    protected static void checkOutputFiles(String path, int expectedCount) {
+    protected static void checkOutputFiles(String path, int expectedCount, boolean readFiles) {
         File[] out_files = new File(path).listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
                 // no junk files
-                return !pathname.getName().startsWith(".");
+                return !((pathname.getName().startsWith(".")) || (pathname.getName().startsWith("_")));
             }
         });
-        for (File r : out_files) System.out.println(r.getAbsolutePath());
-        BufferedSource bi = scala.io.Source.fromFile(out_files[0],"utf-8");
-        System.out.println("files->"+bi.getLines().mkString("\n").substring(0,1000));
+        for (File r : out_files) {
+            System.out.println("Size:"+r.getTotalSpace()+", "+r.getAbsolutePath());
+        }
+        if (readFiles) {
+            BufferedSource bi = scala.io.Source.fromFile(out_files[0], "utf-8");
+            System.out.println("files->" + bi.getLines().mkString("\n").substring(0, 1000));
+        }
 
         assertEquals("Output files should be "+expectedCount,out_files.length,expectedCount);
     }
@@ -126,7 +133,7 @@ public class PerformanceTests implements Serializable {
         DataFrame df = sq.sql("SELECT patientName,toarray(image) slice_count FROM ImageTable");
         //TODO the builtin json doesn't register here so the class name is now explicit
         df.write().format("org.apache.spark.sql.json").save(jsonOutputName);
-        checkOutputFiles(jsonOutputName,1);
+        checkOutputFiles(jsonOutputName,1,true);
     }
 
     /**
@@ -139,7 +146,7 @@ public class PerformanceTests implements Serializable {
         DataFrame df = sq.sql("SELECT patientName,toarray(image) slice_count FROM ImageTable");
         //TODO the builtin json doesn't register here so the class name is now explicit
         df.write().format("org.apache.spark.sql.parquet").save(pqtOutput);
-        checkOutputFiles(pqtOutput,1);
+        checkOutputFiles(pqtOutput,1,false);
     }
 
     @Test
