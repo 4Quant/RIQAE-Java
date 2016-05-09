@@ -13,11 +13,10 @@ import java.io.Serializable;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests to verify the PatientTable works correctly
- * Created by mader on 5/6/16.
+ * Created by mader on 5/9/16.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class PatientTableTests implements Serializable {
+public class FakePluginTests implements Serializable {
     final static String fijiPath = "/Applications/Fiji.app/Contents/";
     final static ImageJSettings ijs = new USBImageJSettings(fijiPath,false,false,false);
 
@@ -33,9 +32,8 @@ public class PatientTableTests implements Serializable {
             ijs,bindPort,bindAddress,userName,bindName);
 
     @Test
-    public void testCountOfTable() {
+    public void createFakeTableTest() {
         assertEquals("Should only be one element",pt.count(),1);
-
     }
 
 }

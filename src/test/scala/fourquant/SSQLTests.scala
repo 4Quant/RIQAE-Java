@@ -1,5 +1,6 @@
 package fourquant
 
+import fourquant.pacs.patients.PacsCommunicationSingleton
 import fourquant.riqae.USBImageJSettings
 import org.scalatest.{FunSuite, Matchers}
 
@@ -7,8 +8,9 @@ class SSQLTests extends FunSuite with Matchers with Serializable {
     val use_hive = true
   val fijiPath = "/Applications/Fiji.app/Contents/"
   val ijs = new USBImageJSettings(fijiPath, false, false, false)
-  val bindPort = 11112
-  val bindAddress = "localhost"
+  val bindPort = PacsCommunicationSingleton.port;
+  val bindAddress = PacsCommunicationSingleton.server;
+
 
   val sq = fourquant.db.demo.createSQLContext(None,bindPort,
     bindAddress,"", true, ijs,use_hive)
