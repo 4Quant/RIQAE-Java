@@ -22,10 +22,10 @@ public class PatientTableTests implements Serializable {
     final static ImageJSettings ijs = new USBImageJSettings(fijiPath,false,false,false);
 
     // get the default values from the communication singleton class
-    final static String bindPort = patients.PacsCommunicationSingleton.port();
-    final static String bindAddress = patients.PacsCommunicationSingleton.server();
-    final static String bindName = patients.PacsCommunicationSingleton.bind();
-    final static String userName = patients.PacsCommunicationSingleton.userName();
+    final static String bindPort = patients.PacsCommunicationSingleton$.MODULE$.port();
+    final static String bindAddress = patients.PacsCommunicationSingleton$.MODULE$.server();
+    final static String bindName = patients.PacsCommunicationSingleton$.MODULE$.bind();
+    final static String userName = patients.PacsCommunicationSingleton$.MODULE$.userName();
     static {
         // register the fake plugin
     }

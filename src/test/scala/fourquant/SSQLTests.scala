@@ -8,7 +8,7 @@ class SSQLTests extends FunSuite with Matchers with Serializable {
     val use_hive = true
   val fijiPath = "/Applications/Fiji.app/Contents/"
   val ijs = new USBImageJSettings(fijiPath, false, false, false)
-  val bindPort = PacsCommunicationSingleton.port;
+  val bindPort = PacsCommunicationSingleton.port.toInt;
   val bindAddress = PacsCommunicationSingleton.server;
 
 
