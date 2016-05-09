@@ -165,4 +165,22 @@ public class PerformanceTests implements Serializable {
         System.out.println("Study ID:"+copdResults.get("PD15"));
         assertTrue("PD15 should be less than -500",copdResults.getOrDefault("PD15",999.0)<-500);
     }
+
+    @Test
+    public void testXPortCOPDAnalysis() throws IOException {
+        String jsonOutputName = File.createTempFile("copd_output",".json").getAbsolutePath()+"_folder/";
+        String csvOutputName = File.createTempFile("copd_output",".csv").getAbsolutePath()+"_folder/";
+        String segCommand = "run2(image,'"+USBImageJSettings.SegmentLung()+"','')";
+
+        String copdQuery = "runrow("+segCommand+",'"+
+                USBImageJSettings.StageLung()+"','')";
+
+        DataFrame df = sq.sql("SELECT patientName,"+copdQuery+" FROM ImageTable");
+
+        df.write().format("org.apache.spark.sql.json").save(jsonOutputName);
+        checkOutputFiles(jsonOutputName,1,true);
+
+        df.write().format("com.databricks.spark.csv").save(csvOutputName);
+        checkOutputFiles(csvOutputName,1,true);
+    }
 }
