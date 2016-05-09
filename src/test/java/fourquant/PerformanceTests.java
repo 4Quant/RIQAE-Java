@@ -118,7 +118,9 @@ public class PerformanceTests implements Serializable {
         }
         if (readFiles) {
             BufferedSource bi = scala.io.Source.fromFile(out_files[0], "utf-8");
-            System.out.println("files->" + bi.getLines().mkString("\n").substring(0, 1000));
+            String outString = bi.getLines().mkString("\n");
+
+            System.out.println("files->" + outString.substring(0, Math.min(200,outString.length())));
         }
 
         assertEquals("Output files should be "+expectedCount,out_files.length,expectedCount);
@@ -179,6 +181,21 @@ public class PerformanceTests implements Serializable {
 
         df.write().format("org.apache.spark.sql.json").save(jsonOutputName);
         checkOutputFiles(jsonOutputName,1,true);
+
+        df.write().format("com.databricks.spark.csv").save(csvOutputName);
+        checkOutputFiles(csvOutputName,1,true);
+    }
+
+    @Test
+    public void testExplodeExportCOPDAnalysis() throws IOException {
+        String jsonOutputName = File.createTempFile("copd_output",".json").getAbsolutePath()+"_folder/";
+        String csvOutputName = File.createTempFile("copd_output",".csv").getAbsolutePath()+"_folder/";
+        String segCommand = "run2(image,'"+USBImageJSettings.SegmentLung()+"','')";
+
+        String copdQuery = "explode(runrow("+segCommand+",'"+
+                USBImageJSettings.StageLung()+"','')) as (label,value)";
+
+        DataFrame df = sq.sql("SELECT patientName,"+copdQuery+" FROM ImageTable");
 
         df.write().format("com.databricks.spark.csv").save(csvOutputName);
         checkOutputFiles(csvOutputName,1,true);
