@@ -34,7 +34,9 @@ public class FakePluginTests implements Serializable {
     final static String userName = patients.PacsCommunicationSingleton$.MODULE$.userName();
     static {
         // register the fake plugin
+        USBImageJSettings.addNewIJPlugin(FakePlugin.class);
     }
+
     PatientTable pt = PatientTable.create_from_csv(FakePluginTests.class.getResource("/single_name.csv").getPath(),
             ijs,bindPort,bindAddress,userName,bindName);
 
